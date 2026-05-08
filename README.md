@@ -106,6 +106,31 @@ cd back
 ./gradlew test
 ```
 
+## CI/CD
+
+Le projet utilise GitHub Actions pour automatiser la validation du monorepo.
+Le workflow se trouve dans `.github/workflows/ci.yml` et se compose de trois
+jobs separes:
+
+- `Back-end`: installe Java 17, utilise le cache Gradle, lance les tests puis
+  le build Spring Boot depuis le dossier `back`.
+- `Front-end`: installe Node.js 20, restaure le cache npm, installe les
+  dependances avec `npm ci`, lance le build Angular puis les tests Karma en
+  mode non interactif avec `ChromeHeadlessNoSandbox`.
+- `SonarQube Cloud`: s'execute apres les jobs back-end et front-end, puis lance
+  l'analyse SonarQube Cloud sur le code Java et TypeScript.
+
+Le pipeline se declenche sur:
+
+- chaque `push`;
+- chaque `pull_request`;
+- une execution manuelle via `workflow_dispatch`;
+- une execution planifiee hebdomadaire.
+
+L'analyse SonarQube Cloud necessite le secret GitHub `SONAR_TOKEN`, a declarer
+dans les secrets du depot. La valeur du token ne doit jamais etre stockee dans
+le code, affichee dans les logs ou ajoutee dans un fichier `.env`.
+
 ### Images Docker
 
 #### Client
