@@ -130,6 +130,8 @@ Le pipeline se declenche sur:
 L'analyse SonarQube Cloud necessite le secret GitHub `SONAR_TOKEN`, a declarer
 dans les secrets du depot. La valeur du token ne doit jamais etre stockee dans
 le code, affichee dans les logs ou ajoutee dans un fichier `.env`.
+Dans un fork sans `SONAR_TOKEN`, le job SonarQube est automatiquement ignore
+pour eviter un echec CI lie a l'absence de secret.
 
 ### Déploiement / Publication des images Docker
 
