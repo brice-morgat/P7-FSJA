@@ -131,6 +131,38 @@ L'analyse SonarQube Cloud necessite le secret GitHub `SONAR_TOKEN`, a declarer
 dans les secrets du depot. La valeur du token ne doit jamais etre stockee dans
 le code, affichee dans les logs ou ajoutee dans un fichier `.env`.
 
+### Déploiement / Publication des images Docker
+
+La publication des images Docker est geree par le workflow
+`.github/workflows/cd.yml`.
+
+Le CD est declenche automatiquement uniquement apres la reussite du workflow
+`CI` sur la branche `main`. Il peut aussi etre lance manuellement avec
+`workflow_dispatch` depuis `main` ou depuis un tag de release commencant par
+`v`. Une simple pull request ne publie aucune image.
+
+Les images sont publiees dans GitHub Container Registry:
+
+- `ghcr.io/<owner>/<repo>/microcrm-back`
+- `ghcr.io/<owner>/<repo>/microcrm-front`
+
+Les noms d'images sont convertis en minuscules dans le workflow avant la
+publication.
+
+Tags generes:
+
+- `sha-<commit_sha>` pour chaque publication back-end et front-end.
+- `latest` uniquement lorsque la publication concerne la branche `main`.
+
+Le workflow utilise les permissions minimales `contents: read` et
+`packages: write`. L'authentification a `ghcr.io` utilise le `GITHUB_TOKEN`
+fourni automatiquement par GitHub Actions via `docker/login-action`; aucun
+token Docker Hub, mot de passe ou secret de publication n'est stocke dans le
+depot.
+
+La documentation technique detaillee des commandes CD se trouve dans
+[`docs/deploiement-images-docker.md`](docs/deploiement-images-docker.md).
+
 ## Docker
 
 Le projet utilise deux Dockerfiles dedies:
