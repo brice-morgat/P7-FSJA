@@ -1,0 +1,18 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: back/Dockerfile
+    image: orion-microcrm-back:local
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: front/Dockerfile
+    image: orion-microcrm-front:local
+    depends_on:
+      - backend
+    ports:
+      - "4200:80"

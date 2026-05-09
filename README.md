@@ -131,50 +131,47 @@ L'analyse SonarQube Cloud necessite le secret GitHub `SONAR_TOKEN`, a declarer
 dans les secrets du depot. La valeur du token ne doit jamais etre stockee dans
 le code, affichee dans les logs ou ajoutee dans un fichier `.env`.
 
-### Images Docker
+## Docker
 
-#### Client
+Le projet utilise deux Dockerfiles dedies:
 
-##### Construire l'image
+- `front/Dockerfile` pour le front Angular (build Node 20 + runtime Caddy).
+- `back/Dockerfile` pour le back Spring Boot (build Gradle JDK 17 + runtime JRE 17 non-root).
 
-```shell
-docker build --target front -t orion-microcrm-front:latest .
-```
-
-##### Exécuter l'image
+### Lancer l'application avec Docker Compose
 
 ```shell
-docker run -it --rm -p 80:80 -p 443:443 orion-microcrm-front:latest
+docker compose up --build
 ```
 
-L'application sera disponible sur https://localhost.
-
-#### Serveur
-
-##### Construire l'image
+Mode detache:
 
 ```shell
-docker build --target back -t orion-microcrm-back:latest .
+docker compose up --build -d
 ```
 
-##### Exécuter l'image
+Arreter l'application:
 
 ```shell
-docker run -it --rm -p 8080:8080 orion-microcrm-back:latest
+docker compose down
 ```
 
-L'API sera disponible sur http://localhost:8080.
+### Ports utilises
 
-#### Tout en un
+- Front-end: http://localhost:4200
+- Back-end: http://localhost:8080
+
+### Construire les images individuellement
 
 ```shell
-docker build --target standalone -t orion-microcrm-standalone:latest .
+docker build -f front/Dockerfile -t orion-microcrm-front:local .
+docker build -f back/Dockerfile -t orion-microcrm-back:local .
 ```
 
-##### Exécuter l'image
+### Justification technique
 
-```shell
-docker run -it --rm -p 8080:8080 -p 80:80 -p 443:443 orion-microcrm-standalone:latest
-```
-
-L'application sera disponible sur https://localhost et l'API sur http://localhost:8080.
+- Multi-stage build conserve pour separer build et runtime.
+- Images officielles legeres (`node:20-alpine`, `gradle:8.7-jdk17-alpine`, `caddy:2.8-alpine`, `eclipse-temurin:17-jre-alpine`).
+- Front statique servi par Caddy avec fallback SPA (`try_files ... /index.html`).
+- Back expose en `8080`.
+- Aucun secret embarque dans les images.

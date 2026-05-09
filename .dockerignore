@@ -3,3 +3,14 @@
 /front/dist
 /front/node_modules
 /front/.angular
+.git
+.github
+**/*.log
+**/logs
+**/tmp
+**/.DS_Store
+**/Thumbs.db
+README.md
+coverage
+front/coverage
+back/out
