@@ -11,6 +11,8 @@ FROM caddy:2.8-alpine@sha256:af32e97399febea808609119bb21544d0265c58a02836576e32
 COPY --from=build /workspace/front/dist/microcrm/browser/ /usr/share/caddy/
 COPY misc/docker/Caddyfile /etc/caddy/Caddyfile
 
-EXPOSE 80
+USER caddy
+
+EXPOSE 8080
 
 CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile"]
