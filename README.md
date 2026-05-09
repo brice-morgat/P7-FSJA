@@ -109,7 +109,7 @@ cd back
 ## CI/CD
 
 Le projet utilise GitHub Actions pour automatiser la validation du monorepo.
-Le workflow se trouve dans `.github/workflows/ci.yml` et se compose de trois
+Le workflow CI se trouve dans `.github/workflows/ci.yml` et se compose de trois
 jobs separes:
 
 - `Back-end`: installe Java 17, utilise le cache Gradle, lance les tests puis
@@ -135,13 +135,18 @@ pour eviter un echec CI lie a l'absence de secret.
 
 ### Déploiement / Publication des images Docker
 
-La publication des images Docker est geree par le workflow
+La publication des images Docker est geree par le workflow CD
 `.github/workflows/cd.yml`.
 
-Le CD est declenche automatiquement uniquement apres la reussite du workflow
-`CI` sur la branche `main`. Il peut aussi etre lance manuellement avec
-`workflow_dispatch` depuis `main` ou depuis un tag de release commencant par
-`v`. Une simple pull request ne publie aucune image.
+Le CD est declenche automatiquement sur un `push` vers `main` ou lors de la
+creation d'un tag de release commencant par `v`. Il peut aussi etre lance
+manuellement avec `workflow_dispatch`. Une simple pull request ne publie aucune
+image.
+
+La garantie "CI validee avant CD" repose sur la protection de branche `main`:
+la branche `main` doit exiger la reussite du workflow `CI` avant merge. Le CD
+publie donc uniquement du code arrive sur `main` apres validation CI, ou un tag
+`v*` cree depuis un commit de release valide.
 
 Les images sont publiees dans GitHub Container Registry:
 

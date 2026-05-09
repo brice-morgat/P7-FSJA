@@ -20,7 +20,7 @@ jobs:
         working-directory: back
 
     steps:
-      - name: Récupérer le code source
+      - name: Recuperer le code source
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Installer Java 17
@@ -30,10 +30,10 @@ jobs:
           java-version: 17
           cache: gradle
 
-      - name: Rendre le Gradle Wrapper exécutable
+      - name: Rendre le Gradle Wrapper executable
         run: chmod +x ./gradlew
 
-      - name: Exécuter les tests back-end
+      - name: Executer les tests back-end
         run: ./gradlew test
 
       - name: Construire le back-end
@@ -48,7 +48,7 @@ jobs:
         working-directory: front
 
     steps:
-      - name: Récupérer le code source
+      - name: Recuperer le code source
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Installer Node.js 20
@@ -58,30 +58,38 @@ jobs:
           cache: npm
           cache-dependency-path: front/package-lock.json
 
-      - name: Installer les dépendances front-end
+      - name: Installer les dependances front-end
         run: npm ci
 
       - name: Construire le front-end
         run: npm run build
 
-      - name: Exécuter les tests front-end
+      - name: Executer les tests front-end
         run: npm test -- --watch=false --browsers=ChromeHeadlessNoSandbox
 
   sonarqube:
     name: SonarQube Cloud
     runs-on: ubuntu-latest
-    if: ${{ secrets.SONAR_TOKEN != '' }}
     needs:
       - backend
       - frontend
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
     steps:
-      - name: Récupérer le code source
+      - name: Recuperer le code source
+        if: ${{ env.SONAR_TOKEN != '' }}
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
 
-      - name: Exécuter l'analyse SonarQube Cloud
+      - name: Executer l'analyse SonarQube Cloud
+        if: ${{ env.SONAR_TOKEN != '' }}
         uses: SonarSource/sonarqube-scan-action@c7ee0f9df90b7aa20e8dcf9695dcfe2e7da5b4f2 # v7.2.1
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+
+      - name: Ignorer SonarQube sans token
+        if: ${{ env.SONAR_TOKEN == '' }}
+        run: |
+          echo "SONAR_TOKEN absent: analyse SonarQube ignoree."
