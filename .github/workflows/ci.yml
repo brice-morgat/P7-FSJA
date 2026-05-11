@@ -21,6 +21,9 @@ jobs:
       pull-requests: read
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
       - name: Build & Test
         uses: ./.github/actions/ci-backend/action.yml
 
@@ -34,6 +37,9 @@ jobs:
       pull-requests: read
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
       - name: Build & Test
         uses: ./.github/actions/ci-frontend/action.yml
 

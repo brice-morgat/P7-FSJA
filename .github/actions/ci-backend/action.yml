@@ -5,10 +5,6 @@ runs:
   using: composite
   steps:
     # Les actions composites sont appelees comme une seule step dans l'UI GitHub.
-    # On garde le checkout ici pour que le workflow n'affiche pas de step supplementaire.
-    - name: Checkout
-      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-
     - name: Installer Java 17
       uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
       with:
