@@ -1,0 +1,43 @@
+name: CI Front-end
+description: "Build, tests et publication des rapports (Front-end)."
+
+runs:
+  using: composite
+  steps:
+    # Hardening: pin les actions externes a un SHA (supply-chain).
+    - name: Recuperer le code source
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+    - name: Installer Node.js 20
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      with:
+        node-version: 20
+        cache: npm
+        cache-dependency-path: front/package-lock.json
+
+    - name: Build et tests (Front-end)
+      shell: bash
+      run: |
+        set -euo pipefail
+        cd front
+        npm ci
+        npm run build
+        npm test -- --watch=false --browsers=ChromeHeadlessNoSandbox
+
+    - name: Publier les resultats de tests (Front-end)
+      if: always()
+      uses: dorny/test-reporter@3eeb9fc888e82e8be2fb356bbeec2750231672bc # v1
+      with:
+        name: Tests Front-end
+        path: front/test-results/*.xml
+        reporter: java-junit
+        fail-on-error: "false"
+
+    - name: Archiver les rapports XML (Front-end)
+      if: always()
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      with:
+        name: rapports-tests-frontend
+        path: front/test-results/*.xml
+        if-no-files-found: warn
+        retention-days: 7

@@ -1,0 +1,42 @@
+name: CI Back-end
+description: "Build, tests et publication des rapports (Back-end)."
+
+runs:
+  using: composite
+  steps:
+    # Hardening: pin les actions externes a un SHA (supply-chain).
+    - name: Recuperer le code source
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+    - name: Installer Java 17
+      uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
+      with:
+        distribution: temurin
+        java-version: 17
+        cache: gradle
+
+    - name: Build et tests (Back-end)
+      shell: bash
+      run: |
+        set -euo pipefail
+        chmod +x ./back/gradlew
+        cd back
+        ./gradlew build --no-daemon
+
+    - name: Publier les resultats de tests (Back-end)
+      if: always()
+      uses: dorny/test-reporter@3eeb9fc888e82e8be2fb356bbeec2750231672bc # v1
+      with:
+        name: Tests Back-end
+        path: back/build/test-results/test/*.xml
+        reporter: java-junit
+        fail-on-error: "false"
+
+    - name: Archiver les rapports XML (Back-end)
+      if: always()
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      with:
+        name: rapports-tests-backend
+        path: back/build/test-results/test/*.xml
+        if-no-files-found: warn
+        retention-days: 7

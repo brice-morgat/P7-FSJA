@@ -1,0 +1,23 @@
+name: CI SonarQube
+description: "Analyse Qualite / Securite (SonarQube Cloud), ignoree si SONAR_TOKEN absent."
+
+runs:
+  using: composite
+  steps:
+    - name: Recuperer le code source (historique complet)
+      if: ${{ env.SONAR_TOKEN != '' }}
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      with:
+        fetch-depth: 0
+
+    - name: Executer l'analyse SonarQube Cloud
+      if: ${{ env.SONAR_TOKEN != '' }}
+      uses: SonarSource/sonarqube-scan-action@c7ee0f9df90b7aa20e8dcf9695dcfe2e7da5b4f2 # v7.2.1
+      env:
+        SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+
+    - name: Ignorer SonarQube sans token
+      if: ${{ env.SONAR_TOKEN == '' }}
+      shell: bash
+      run: |
+        echo "SONAR_TOKEN absent: analyse SonarQube ignoree."
