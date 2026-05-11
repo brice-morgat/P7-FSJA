@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Build & Test
-        uses: ./.github/actions/ci-backend/action.yml
+        uses: ./.github/actions/ci-backend
 
   frontend:
     name: Build & Test (Front-end)
@@ -41,7 +41,7 @@ jobs:
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Build & Test
-        uses: ./.github/actions/ci-frontend/action.yml
+        uses: ./.github/actions/ci-frontend
 
   sonarqube:
     name: Analyse Qualite / Securite (SonarQube)
@@ -57,4 +57,4 @@ jobs:
 
     steps:
       - name: Analyse Qualite / Securite (SonarQube)
-        uses: ./.github/actions/ci-sonarqube/action.yml
+        uses: ./.github/actions/ci-sonarqube
