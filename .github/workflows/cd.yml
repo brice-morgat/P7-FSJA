@@ -1,11 +1,13 @@
-name: Deploiement Continu
+name: CD
 
 on:
-  push:
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
     branches:
       - main
-    tags:
-      - "v*"
   workflow_dispatch:
 
 permissions:
@@ -16,23 +18,29 @@ jobs:
   publish:
     name: Publication des images Docker
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Recuperer le code source
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - name: Generer les noms et tags d'image
         id: image
         shell: bash
+        env:
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch || github.ref_name }}
         run: |
           owner_repo="${GITHUB_REPOSITORY,,}"
-          sha_tag="sha-${GITHUB_SHA}"
+          sha_tag="sha-${HEAD_SHA}"
           back_image="ghcr.io/${owner_repo}/microcrm-back"
           front_image="ghcr.io/${owner_repo}/microcrm-front"
           back_tags="${back_image}:${sha_tag}"
           front_tags="${front_image}:${sha_tag}"
 
-          if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
+          if [[ "${HEAD_BRANCH}" == "main" ]]; then
             back_tags="${back_tags}"$'\n'"${back_image}:latest"
             front_tags="${front_tags}"$'\n'"${front_image}:latest"
           fi
