@@ -8,6 +8,9 @@ on:
       - completed
     branches:
       - main
+  push:
+    tags:
+      - "v*"
   workflow_dispatch:
 
 permissions:
@@ -18,7 +21,12 @@ jobs:
   publish:
     name: Publication des images Docker
     runs-on: ubuntu-latest
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    if: >-
+      ${{
+        (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
+        || (github.event_name == 'push' && github.ref_type == 'tag' && startsWith(github.ref_name, 'v'))
+        || (github.event_name == 'workflow_dispatch')
+      }}
 
     steps:
       - name: Recuperer le code source
@@ -31,7 +39,9 @@ jobs:
         shell: bash
         env:
           HEAD_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
-          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch || github.ref_name }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch || '' }}
+          REF_NAME: ${{ github.ref_name }}
+          REF_TYPE: ${{ github.ref_type }}
         run: |
           owner_repo="${GITHUB_REPOSITORY,,}"
           sha_tag="sha-${HEAD_SHA}"
@@ -43,6 +53,11 @@ jobs:
           if [[ "${HEAD_BRANCH}" == "main" ]]; then
             back_tags="${back_tags}"$'\n'"${back_image}:latest"
             front_tags="${front_tags}"$'\n'"${front_image}:latest"
+          fi
+
+          if [[ "${REF_TYPE}" == "tag" && "${REF_NAME}" == v* ]]; then
+            back_tags="${back_tags}"$'\n'"${back_image}:${REF_NAME}"
+            front_tags="${front_tags}"$'\n'"${front_image}:${REF_NAME}"
           fi
 
           {
