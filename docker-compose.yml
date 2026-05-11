@@ -4,15 +4,23 @@ services:
       context: .
       dockerfile: back/Dockerfile
     image: orion-microcrm-back:local
+    user: "0"
+    environment:
+      - LOG_PATH=/logs
     ports:
       - "8080:8080"
+    volumes:
+      - ./logs/backend:/logs
 
   frontend:
     build:
       context: .
       dockerfile: front/Dockerfile
     image: orion-microcrm-front:local
+    user: "0"
     depends_on:
       - backend
     ports:
       - "4200:8080"
+    volumes:
+      - ./logs/frontend:/logs

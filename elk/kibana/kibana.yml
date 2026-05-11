@@ -1,0 +1,13 @@
+server.host: "0.0.0.0"
+
+elasticsearch.hosts:
+  - "http://elasticsearch:9200"
+
+xpack.security.enabled: false
+
+# Fleet/Integrations needs to reach the Elastic Package Registry (EPR).
+# If your environment requires an HTTP(S) proxy or you use an internal EPR,
+# uncomment and set the values below (via env vars or inline).
+#
+# xpack.fleet.registryProxyUrl: ${FLEET_REGISTRY_PROXY_URL}
+# xpack.fleet.registryUrl: ${FLEET_REGISTRY_URL}

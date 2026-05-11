@@ -200,6 +200,10 @@ docker compose down
 - Front-end: http://localhost:4200
 - Back-end: http://localhost:8080
 
+### Centraliser les logs (ELK)
+
+Voir `docs/elk.md`.
+
 ### Construire les images individuellement
 
 ```shell
