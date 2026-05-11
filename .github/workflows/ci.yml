@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Build & Test
-        uses: ./.github/actions/ci-backend
+        uses: ./.github/actions/ci-backend/action.yml
 
   frontend:
     name: Build & Test (Front-end)
@@ -35,7 +35,7 @@ jobs:
 
     steps:
       - name: Build & Test
-        uses: ./.github/actions/ci-frontend
+        uses: ./.github/actions/ci-frontend/action.yml
 
   sonarqube:
     name: Analyse Qualite / Securite (SonarQube)
@@ -51,4 +51,4 @@ jobs:
 
     steps:
       - name: Analyse Qualite / Securite (SonarQube)
-        uses: ./.github/actions/ci-sonarqube
+        uses: ./.github/actions/ci-sonarqube/action.yml
